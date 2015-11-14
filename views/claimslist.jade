@@ -1,0 +1,9 @@
+extends layout
+
+block content
+    h1.
+        Address Details
+    ul
+        each AddressDetails, i in AddressDetailsList
+            li
+                a(href="mailto:#{user.email}")= user.username				

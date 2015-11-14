@@ -1,0 +1,229 @@
+extends layout
+
+block content
+  h1 Offline Claims Investiogation API
+  p Welcome to Offline Claims
+  p
+  doctype html
+  head
+    title Jade
+    script(type='text/javascript').
+      foo = true;
+      bar = function () {};
+      if (foo) {
+      bar(1 + 5)
+      }
+  body
+   
+    h1#user-content-express-mongo-rest.deep-link.package-name-redundant
+      a(href='#express-mongo-rest') express-mongo-rest
+    p Node.js package to create an express middleware for a mongo-backed, RESTful API
+    pre.
+    p
+      | The middleware is schema-agnostic, allowing any json document to be persisted and retrieved from mongo.
+    table
+      thead
+        tr
+          th Route
+          th Method
+          th Notes
+      tbody
+        tr
+          td /:collection
+          td GET
+          td
+            | Search the collection (uses 
+            a(href='https://www.npmjs.com/package/query-to-mongo') query-to-mongo
+            | )
+        tr
+          td /:collection
+          td POST
+          td Create a single document
+        tr
+          td /:collection
+          td PUT
+          td Method Not Allowed
+        tr
+          td /:collection
+          td PATCH
+          td Method Not Allowed
+        tr
+          td /:collection
+          td DELETE
+          td Remove all documents
+        tr
+          td /:collection/:id
+          td GET
+          td Retrieve a single document
+        tr
+          td /:collection/:id
+          td POST
+          td Method Not Allowed
+        tr
+          td /:collection/:id
+          td PUT
+          td Create or update a document
+        tr
+          td /:collection/:id
+          td PATCH
+          td
+            | Update fields in a document (uses 
+            a(href='https://www.npmjs.com/package/jsonpatch-to-mongodb') jsonpatch-to-mongodb
+            | )
+        tr
+          td /:collection/:id
+          td DELETE
+          td Remove a single document
+    h2#user-content-api.deep-link
+      a(href='#api') API
+    h3#user-content-expressmongorest-db-options.deep-link
+      a(href='#expressmongorest-db-options') expressMongoRest(db, options)
+    p Create an express middleware that implements a RESTful API.
+    h4#user-content-options.deep-link
+      a(href='#options') options:
+    ul
+      li
+        strong envelope
+        |  Return responses wrapped in a type envelope. This can be overriden per request by specifying an 
+        em envelope
+        |  query parameter.
+      li
+        strong singularize
+        |  A function to change the collection name into it's singlur form (ie., 'users' becomes 'user'). Used when returning a envelope for a single instance. Default is 
+        a(href='https://www.npmjs.com/package/inflection') inflection.singularize
+        | .
+    h2#user-content-use.deep-link
+      a(href='#use') Use
+    p
+      | I wanted to make it extremely simple to start a mongo-backed rest server, so 
+      code npm start
+      |  starts one. The 
+      code server.js
+      |  script employs many best-practices for rest servers such as using https, gzip, and method overrides.
+    p
+      | You can configure the following options in the .env file (uses 
+      a(href='https://www.npmjs.com/package/dotenv') dotenv
+      | ):
+    ul
+      li
+        strong DB
+        |  The url for the mongo database. Default is 
+        code mongodb://localhost:27017/express-rest-mongo
+        | .
+      li
+        strong PORT
+        |  The port to listen on. Default is 3000.
+      li
+        strong PFX
+        |  Certificate, Private key and CA certficiates to use for SSL. Default is none.
+      li
+        strong KEY
+        |  Private key to use for SSL. Default is none.
+      li
+        strong CERT
+        |  Certificate, to use for SSL. Default is none.
+        | If neither of PFX or a KEY/CERT pair are specified, a self-sigend certificate and key is generated.
+    h3#user-content-querying-documents.deep-link
+      a(href='#querying-documents') Querying documents
+    p
+      | The query API (GET /:collection) uses a robust query syntax that interprets comparision operators (=, !=, >, <, >=, <=) in the query portion of the URL using 
+      a(href='https://www.npmjs.com/package/query-to-mongo') query-to-mongo
+      | .
+    p
+      | For example, the URL 
+      code https://localhost/api/v1/users?firstName=John&age>=21
+      |  would search the 
+      em users
+      |  collection for any entries that have a 
+      em firstName
+      |  of "John" and an 
+      em age
+      |  greater than or equal to 21.
+    h3#user-content-patching-documents.deep-link
+      a(href='#patching-documents') Patching documents
+    p
+      | The patch document API (PATCH /:collection/:id) will update fields within a document. The API expects a JSON patch payload as defined in 
+      a(href='https://tools.ietf.org/html/rfc6902') RFC 6902
+      | . The API uses 
+      a(href='https://www.npmjs.com/package/jsonpatch-to-mongodb') jsonpatch-to-mongodb
+      |  to interpret the patch.
+    p An example patch using jQuery:
+    pre.
+    h3#user-content-returning-result-envelopes.deep-link
+      a(href='#returning-result-envelopes') Returning result envelopes
+    p
+      | The APIs that return results (all except DELETE) can be set to wrap those results in a type envelope; either server-wide by specifying the 
+      em envelope
+      |  option when creating the middleware, or per request by including an 
+      em envelope
+      |  query paramter in the URL.
+    p
+      | The type envelope will use the singularized name of the collection. The singularizer can be specified using the 
+      em singularize
+      |  option when creating the middleware. The default is 
+      a(href='https://www.npmjs.com/package/inflection') inflection.singularize
+      | .
+    p
+      | For example 
+      code
+        | https://localhost/api/v1/users/2d0aa7b0-cf14-413e-9093-7bbba4f4b220?envelope=true
+      |  returns:
+    pre.
+    p
+      | and 
+      code
+        | https://localhost/api/v1/users/2d0aa7b0-cf14-413e-9093-7bbba4f4b220?envelope=false
+      |  returns:
+    pre.
+    p
+      | The envelope for query results uses the collection name (and assumes it is plural); 
+      code https://localhost/api/v1/users?envelope=true
+      |  returns:
+    pre.
+    h3#user-content-best-practices.deep-link
+      a(href='#best-practices') Best Practices
+    p
+      | The server script was strongly influenced by 
+      a(href='http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api') these
+      a(href='http://blog.mwaysolutions.com/2014/06/05/10-best-practices-for-better-restful-api/') articles
+      |  about best practices for RESTful APIs.
+    p
+      | Here's the list of recommendations from those articles. Items not yet supported are struck-through:
+    ol
+      li Use nouns but no verbs
+      li GET method and query parameters should not alter the state
+      li Use SSL everywhere
+      li Have great documentation
+      li Use plural nouns
+      li Use sub-resources for relations
+      li Provide a way to autoload related resource representations
+      li Use HTTP headers for serialization formats
+      li Use HATEOAS
+      li
+        | Provider filtering, sorting, field selection and paging for collections
+        ul
+          li Filtering
+          li Sorting
+          li Field selection
+          li Paging
+      li Version your API
+      li Return something useful from POST, PATCH, & PUT requests
+      li
+        | Handle Errors with HTTP status codes
+        ul
+          li Use HTTP status codes
+          li Use error payloads
+      li Allow overriding HTTP method
+      li
+        | Use JSON where possible, XML only if you have to 
+        em No application/xml support
+      li Pretty print by default & ensure gzip is supported
+      li Don't use response envelopes by default
+      li
+        | Consider using JSON for POST, PUT and PATCH request bodies 
+        em No application/x-www-form-urlencoded or multipart/form-data support
+      li Provide useful response headers for rate limiting
+      li
+        | Use token based authentication, transported over OAuth2 where delegation is needed
+      li Include response headers that facilitate caching
+   
